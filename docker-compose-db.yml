@@ -1,0 +1,24 @@
+name: reccelogdatabase
+
+services:
+  postgis:
+    image: postgis/postgis:18-3.6
+    container_name: dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DEV_DB}
+      POSTGRES_USER: ${DEV_DB_USER}
+      POSTGRES_PASSWORD: ${DEV_DB_PASSWORD}
+    ports:
+      - "${DEV_DB_PORT}:5432"
+    networks:
+      - reccelog-shared-network
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+volumes:
+  postgres_data:
+
+networks:
+  reccelog-shared-network:
+    external: true
