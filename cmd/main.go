@@ -20,17 +20,25 @@ func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 
+	var connString string
+	value, exists := os.LookupEnv("DB_CONN_STRING")
+	if exists {
+		connString = value
+	} else {
+		connString = fmt.Sprintf(
+			"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+			os.Getenv("DEV_DB_HOST"),
+			os.Getenv("DEV_DB_PORT"),
+			os.Getenv("DEV_DB_USER"),
+			os.Getenv("DEV_DB_PASSWORD"),
+			os.Getenv("DEV_DB"),
+		)
+	}
+
 	apiCfg := presentation.ApiConfig{
 		Address: ":8080",
 		Db: database.DbConfig{
-			ConnString: fmt.Sprintf(
-				"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-				os.Getenv("DEV_DB_HOST"),
-				os.Getenv("DEV_DB_PORT"),
-				os.Getenv("DEV_DB_USER"),
-				os.Getenv("DEV_DB_PASSWORD"),
-				os.Getenv("DEV_DB"),
-			),
+			ConnString: connString,
 		},
 	}
 

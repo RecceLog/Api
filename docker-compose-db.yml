@@ -3,7 +3,7 @@ name: reccelogdatabase
 services:
   postgis:
     image: postgis/postgis:18-3.6
-    container_name: dev
+    container_name: db_dev
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${DEV_DB}
