@@ -70,22 +70,36 @@ func (c *routesController) GetRoutesInRange(ctx *gin.Context) {
 		return
 	}
 
-	// Get position coordinates from body
-	var startingPoint domain.Coordinate
-	if err := ctx.ShouldBindJSON(&startingPoint); err != nil {
-		ErrorResponse(ctx, http.StatusBadGateway, "Invalid body format", err)
+	// Get position coordinates from headers
+	latHeader := ctx.GetHeader("Latitude")
+	lngHeader := ctx.GetHeader("Longitude")
+	lat, err := strconv.ParseFloat(latHeader, 64)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid latitude value",
+		})
+		return
+	}
+
+	lng, err := strconv.ParseFloat(lngHeader, 64)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid longitude value",
+		})
 		return
 	}
 
 	// Get routes in range
-	routes, err := c.routesService.FindInRange(ctx.Request.Context(), startingPoint, _range)
+	routes, err := c.routesService.FindInRange(ctx.Request.Context(), domain.Coordinate{Lat: lat, Lng: lng}, _range)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusInternalServerError, "Error retrieving routes from database", err)
 		return
 	}
 
 	// Return response
-	ctx.JSON(http.StatusOK, routes)
+	ctx.JSON(http.StatusOK, gin.H{
+		"routes": routes,
+	})
 }
 
 func (c *routesController) GetRouteById(ctx *gin.Context) {
