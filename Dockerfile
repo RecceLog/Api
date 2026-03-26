@@ -2,6 +2,8 @@ FROM golang:1.25.5-alpine3.23
 
 WORKDIR /app
 
+RUN go install github.com/pressly/goose/v3/cmd/goose@latest
+
 COPY go.mod go.sum ./
 RUN go mod download
 
