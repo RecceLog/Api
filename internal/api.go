@@ -1,12 +1,12 @@
-package presentation
+package internal
 
 import (
+	services2 "Api/internal/application/services"
 	"log/slog"
 	"net/http"
 	"time"
 
 	"Api/internal/infrastructure/database"
-	"Api/internal/infrastructure/services"
 	"Api/internal/presentation/controllers"
 
 	"github.com/gin-gonic/gin"
@@ -27,8 +27,8 @@ func (app Application) Mount() http.Handler {
 		gin.Logger(),
 	)
 
-	routesService := services.NewRoutesService(app.Db)
-	notesService := services.NewNotesService(app.Db)
+	routesService := services2.NewRoutesService(app.Db)
+	notesService := services2.NewNotesService(app.Db)
 
 	routesController := controllers.NewRoutesController(routesService, notesService)
 
@@ -74,5 +74,3 @@ type ApiConfig struct {
 	Address string
 	Db      database.DbConfig
 }
-
-

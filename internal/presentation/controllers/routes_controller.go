@@ -1,8 +1,8 @@
 package controllers
 
 import (
+	services2 "Api/internal/application/services"
 	"Api/internal/domain"
-	"Api/internal/infrastructure/services"
 	"net/http"
 	"strconv"
 
@@ -11,11 +11,11 @@ import (
 )
 
 type routesController struct {
-	routesService services.RoutesService
-	notesService  services.NotesService
+	routesService services2.RoutesService
+	notesService  services2.NotesService
 }
 
-func NewRoutesController(_routesService services.RoutesService, _notesService services.NotesService) *routesController {
+func NewRoutesController(_routesService services2.RoutesService, _notesService services2.NotesService) *routesController {
 	return &routesController{
 		routesService: _routesService,
 		notesService:  _notesService,
@@ -28,7 +28,7 @@ type CreateRouteRequest struct {
 }
 
 type RouteNotesResponse struct {
-	Route     domain.Route    `json:"route"`
+	Route     domain.Route     `json:"route"`
 	NotesSets []domain.NoteSet `json:"note_sets"`
 }
 
@@ -127,7 +127,7 @@ func (c *routesController) GetRouteById(ctx *gin.Context) {
 
 	// Write response body
 	ctx.JSON(http.StatusOK, RouteNotesResponse{
-		Route: route,
+		Route:     route,
 		NotesSets: noteSets,
 	})
 }

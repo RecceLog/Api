@@ -25,7 +25,7 @@ type routesService struct {
 }
 
 func NewRoutesService(conn *pgxpool.Pool) RoutesService {
-	return &routesService {
+	return &routesService{
 		connPool: conn,
 	}
 }
@@ -129,7 +129,7 @@ func (s *routesService) FindById(ctx context.Context, id uuid.UUID) (domain.Rout
 			if stopLat != nil && stopLng != nil {
 				route.Waypoints = append(route.Waypoints, domain.Waypoint{
 					Position: domain.Coordinate{Lat: *stopLat, Lng: *stopLng},
-					Order: i,
+					Order:    i,
 				})
 			}
 		} else {
@@ -151,7 +151,7 @@ func (s *routesService) FindById(ctx context.Context, id uuid.UUID) (domain.Rout
 			if stopLat != nil && stopLng != nil {
 				route.Waypoints = append(route.Waypoints, domain.Waypoint{
 					Position: domain.Coordinate{Lat: *stopLat, Lng: *stopLng},
-					Order: i,
+					Order:    i,
 				})
 			}
 		}
@@ -220,7 +220,7 @@ func scanRoutesRows(rows pgx.Rows) ([]domain.Route, error) {
 			if stopLat != nil && stopLng != nil {
 				existingRoute.Waypoints = append(existingRoute.Waypoints, domain.Waypoint{
 					Position: domain.Coordinate{Lat: *stopLat, Lng: *stopLng},
-					Order: i,
+					Order:    i,
 				})
 			}
 		} else {
@@ -229,7 +229,7 @@ func scanRoutesRows(rows pgx.Rows) ([]domain.Route, error) {
 			if stopLat != nil && stopLng != nil {
 				route.Waypoints = append(route.Waypoints, domain.Waypoint{
 					Position: domain.Coordinate{Lat: *stopLat, Lng: *stopLng},
-					Order: i,
+					Order:    i,
 				})
 			}
 			routesMap[route.Id] = &route

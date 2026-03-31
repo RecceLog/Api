@@ -2,25 +2,31 @@ package main
 
 import (
 	"Api/internal"
+	"Api/internal/infrastructure/cache"
 	"Api/internal/infrastructure/database"
-	"Api/internal/presentation"
 	"context"
-	"fmt"
 	"log/slog"
 	"os"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/redis/go-redis/v9"
 )
 
 func init() {
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
+	slog.Debug("Logger initialized")
 	internal.LoadEnvVariables()
+	slog.Debug("Environment variables initialized")
 }
 
 func main() {
 
 	ctx := context.Background()
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	slog.SetDefault(logger)
 
-	var connString string
+	dbConnPool, rdb := configureServices(ctx)
+
+	/*var connString string
 	value, exists := os.LookupEnv("DB_CONN_STRING")
 	if exists {
 		connString = value
@@ -42,7 +48,7 @@ func main() {
 		},
 	}
 
-	connPool, err := database.InitDBConnection(ctx, apiCfg.Db.ConnString)
+	connPool, err := database.InitDBConnection(ctx)
 	if err != nil {
 		slog.Error("Error connecting to database", "error", err.Error())
 		return
@@ -59,5 +65,27 @@ func main() {
 	if err := api.Run(api.Mount()); err != nil {
 		slog.Error("Server failed to start", "error", err.Error())
 		os.Exit(1)
+	}*/
+}
+
+func configureServices(ctx context.Context) (*pgxpool.Pool, *redis.Client) {
+	// database configuration
+	dbConnPool, err := database.ConnectDB(ctx)
+	if err != nil {
+		slog.Error("Error connecting to database, shutting down", "error message", err.Error())
+		os.Exit(1)
 	}
+	slog.Debug("Connected to database")
+
+	// caching configuration
+	rdb, err := cache.ConnectRedis(ctx)
+	if err != nil {
+		slog.Error("Error connecting to redis, shutting down", "error message", err.Error())
+		os.Exit(1)
+	}
+	slog.Debug("Caching initialized")
+
+	// api configuration
+
+	return dbConnPool, rdb
 }
