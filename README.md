@@ -71,3 +71,303 @@ docker compose -f docker-compose-api.yml up -d
 # Or if you want to build and run
 docker compose -f docker-compose-api.yml up -d --build
 ```
+
+# Esempi di richieste
+```http request
+# INSERIRE STRADA: Panoramica
+POST https://reccelogapi.onrender.com/v1/routes/
+Content-Type: application/json
+
+{
+    "route": {
+        "start": {
+            "lat": 45.044153,
+            "lng": 7.766673
+        },
+        "finish": {
+            "lat": 45.074064,
+            "lng": 7.777123
+        }
+    },
+    "note_set": {
+        "notes": [
+            {
+                "position": {
+                    "lat": 45.045115,
+                    "lng": 7.767779
+                },
+                "type": "indication",
+                "severity": "3",
+                "direction":"left",
+                "description": "sinistra tre"
+            },
+            {
+                "position": {
+                    "lat": 45.045957,
+                    "lng": 7.767379
+                },
+                "type": "indication",
+                "severity": "3",
+                "direction":"right",
+                "description": "destra tre chiude"
+            }
+        ]
+    }
+}
+
+###
+# INSERIRE STRADA: Strada comunale superga
+POST https://reccelogapi.onrender.com/v1/routes/
+Content-Type: application/json
+
+{
+  "route": {
+    "start": {
+      "lat": 45.081807,
+      "lng": 7.732988
+    },
+    "finish": {
+      "lat": 45.077277,
+      "lng": 7.761719
+    }
+  },
+  "note_set": {
+    "notes": [
+      {
+        "position": {
+          "lat": 45.045115,
+          "lng": 7.767779
+        },
+        "type": "indication",
+        "severity": "3",
+        "direction":"left",
+        "description": "sinistra tre"
+      },
+      {
+        "position": {
+          "lat": 45.045957,
+          "lng": 7.767379
+        },
+        "type": "indication",
+        "severity": "3",
+        "direction":"right",
+        "description": "destra tre chiude"
+      }
+    ]
+  }
+}
+
+###
+# INSERIRE STRADA: Via cave (rorà)
+POST https://reccelogapi.onrender.com/v1/routes/
+Content-Type: application/json
+
+{
+    "route": {
+        "start": {
+            "lat": 44.805123,
+            "lng": 7.242619
+        },
+        "finish": {
+            "lat": 44.791587,
+            "lng": 7.200493
+        }
+    },
+    "note_set": {
+        "notes": [
+            {
+                "position": {
+                    "lat": 44.804893,
+                    "lng": 7.241788
+                },
+                "type": "indication",
+                "severity": "6",
+                "direction":"left",
+                "description": "sinistra sei"
+            },
+            {
+                "position": {
+                    "lat": 44.804576,
+                    "lng": 7.241054
+                },
+                "type": "indication",
+                "severity": "5",
+                "direction":"right",
+                "description": "destra cinque"
+            },
+            {
+                "position": {
+                    "lat": 44.804391,
+                    "lng": 7.240395
+                },
+                "type": "indication",
+                "severity": "4",
+                "direction":"left",
+                "description": "sinistra quattro"
+            },
+            {
+                "position": {
+                    "lat": 44.804053,
+                    "lng": 7.239881
+                },
+                "type": "indication",
+                "severity": "5",
+                "direction":"right",
+                "description": "destra cinque"
+            },
+            {
+                "position": {
+                    "lat": 44.803604,
+                    "lng": 7.238797
+                },
+                "type": "indication",
+                "severity": "3",
+                "direction":"right",
+                "description": "destra tre"
+            },
+            {
+                "position": {
+                    "lat": 44.803744,
+                    "lng": 7.23664
+                },
+                "type": "indication",
+                "severity": "6",
+                "direction":"left",
+                "description": "sinistra sei"
+            },
+            {
+                "position": {
+                    "lat": 44.8037284,
+                    "lng": 7.234777
+                },
+                "type": "indication",
+                "severity": "6",
+                "direction":"left",
+                "description": "sinistra sei"
+            },
+            {
+                "position": {
+                    "lat": 44.803007,
+                    "lng": 7.232098
+                },
+                "type": "indication",
+                "severity": "7",
+                "direction":"straight",
+                "description": "rettilineo 100"
+            }
+        ]
+    }
+}
+
+###
+# INSERIRE STRADA: Strada secondaria rorà
+POST https://reccelogapi.onrender.com/v1/routes/
+Content-Type: application/json
+
+{
+    "route": {
+        "start": {
+            "lat": 44.806422,
+            "lng": 7.287241
+        },
+        "waypoints": [
+            {
+                "position": {
+                    "lat": 44.806649,
+                    "lng": 7.272475
+                }
+            },
+            {
+                "position": {
+                    "lat": 44.804868,
+                    "lng": 7.2558
+                }
+            }
+        ],
+        "finish": {
+            "lat": 44.791587,
+            "lng": 7.200493
+        }
+    },
+    "note_set": {
+        "notes": [
+            {
+                "position": {
+                    "lat": 44.806329,
+                    "lng": 7.282342
+                },
+                "type": "indication",
+                "severity": "4",
+                "direction":"right",
+                "description": "test"
+            },
+            {
+                "position": {
+                    "lat": 44.80648,
+                    "lng": 7.281546
+                },
+                "type": "indication",
+                "severity": "5",
+                "direction":"left",
+                "description": "test"
+            }
+        ]
+    }
+}
+
+###
+# OTTENERE TUTTE LE STRADE
+GET https://reccelogapi.onrender.com/v1/routes
+
+###
+# OTTENERE DATI DI STRADA SPECIFICA CON TUTTI I NOTE SET
+GET https://reccelogapi.onrender.com/v1/routes/019b85eb-2bbc-7bf0-a08b-d4b1f811750d
+
+###
+# OTTENERE TUTTE LE STRADE IN UN RANGE
+GET https://reccelogapi.onrender.com/v1/routes/range/10000
+Latitude: 45.013902
+Longitude: 7.659012
+
+###
+# OTTENERE NOTE DI UN SET DI UNA STRADA
+GET http://localhost:8080/v1/routes/019aeac6-4dea-71f7-86b6-e05e67ce5167/note-set/019aeac5-4df9-7abc-9d29-a09c9485a5ff
+
+###
+# MODIFICA NOTA DI UN SET DI UNA STRADA
+PATCH http://localhost:8080/v1/notes/019aeac6-4dea-71f7-86b6-e05e67ce5167/note-set/019aeac6-4df9-7abc-9d29-a09c9485a5ff/note/
+
+###
+# AGGIUNGERE SET DI NOTE AD UNA STRADA
+POST http://localhost:8080/v1/routes/019aeac6-4dea-71f7-86b6-e05e67ce5167/notes
+Content-Type: application/json
+
+{
+    "notes": [
+        {
+            "position": {
+                "lat": 44.884646,
+                "lng": 7.369042
+            },
+            "type": "warning",
+            "severity": "",
+            "direction": "left",
+            "description": "autovelox"
+        },
+        {
+            "position": {
+                "lat": 44.878532,
+                "lng": 7.355322
+            },
+            "type": "warning",
+            "severity": "",
+            "direction": "left",
+            "description": "altra roba"
+        }
+    ]
+}
+
+###
+# CANCELLA SET DI NOTE DI UNA STRADA
+DELETE http://localhost:8080/v1/routes/019aeac6-4dea-71f7-86b6-e05e67ce5167/note-set/019aeb3b-ba19-7ebc-8ea1-609050485c48
+```
