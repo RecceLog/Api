@@ -32,9 +32,9 @@ func ConnectDB(ctx context.Context) (*pgxpool.Pool, error) {
 
 func initDBConnection(ctx context.Context) (*pgxpool.Pool, error) {
 
-	connString, exists := os.LookupEnv("DB_CONNECTION_STRING")
+	connString, exists := os.LookupEnv("DB_CONN_STRING")
 	if !exists {
-		return nil, fmt.Errorf("DB_CONNECTION_STRING environment variable not found")
+		return nil, fmt.Errorf("DB_CONN_STRING environment variable not found")
 	}
 
 	// Create configuration for connection pool

@@ -1,24 +1,33 @@
 package internal
 
 import (
-	services2 "Api/internal/application/services"
+	"Api/internal/application/services"
+	"Api/internal/infrastructure/repositories"
+	"cmp"
+	"fmt"
 	"log/slog"
 	"net/http"
+	"os"
 	"time"
 
-	"Api/internal/infrastructure/database"
 	"Api/internal/presentation/controllers"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/redis/go-redis/v9"
 )
 
 type Application struct {
-	Config ApiConfig
-	Db     *pgxpool.Pool
+	Addr  string
+	Db    *pgxpool.Pool
+	Cache *redis.Client
 }
 
 func (app Application) Mount() http.Handler {
+
+	if os.Getenv("ENV") == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 
 	r := gin.New()
 
@@ -27,30 +36,35 @@ func (app Application) Mount() http.Handler {
 		gin.Logger(),
 	)
 
-	routesService := services2.NewRoutesService(app.Db)
-	notesService := services2.NewNotesService(app.Db)
+	routesRepo := repositories.NewRoutesRepository()
+	notesRepo := repositories.NewNotesRepository()
 
-	routesController := controllers.NewRoutesController(routesService, notesService)
+	routesService := services.NewRoutesService(app.Db, routesRepo, notesRepo)
+	//notesService := services.NewNotesService(app.Db)
+
+	routesController := controllers.NewRoutesController(routesService)
+	notesController := controllers.NewNotesController(routesService)
 
 	v1 := r.Group("/v1")
 	{
 		routes := v1.Group("/routes")
+		notes := v1.Group("/notes")
 
 		// CREATE
 		routes.POST("/", routesController.CreateRoute)
-		routes.POST("/:id/notes", routesController.AddNoteSetToRoute)
+		routes.POST("/:id/notes", notesController.AddNoteSetToRoute)
 
 		// READ
 		routes.GET("/", routesController.GetRoutes)
 		routes.GET("/:id", routesController.GetRouteById)
 		routes.GET("/range/:range", routesController.GetRoutesInRange)
-		routes.GET("/:id/note-set/:set", routesController.GetNoteSetOfRoute)
+		notes.GET("/:id", notesController.GetNoteSetOfRoute)
 
 		// UPDATE
 
 		// DELETE
 		routes.DELETE("/:id", routesController.DeleteRoute)
-		routes.DELETE("/:id/note-set/:set", routesController.DeleteNoteSetFromRoute)
+		notes.DELETE("/:set", notesController.DeleteNoteSetFromRoute)
 	}
 
 	return r
@@ -58,19 +72,14 @@ func (app Application) Mount() http.Handler {
 
 func (app Application) Run(h http.Handler) error {
 	srv := &http.Server{
-		Addr:         app.Config.Address,
+		Addr:         cmp.Or(os.Getenv("ADDR"), ":8080"),
 		Handler:      h,
 		WriteTimeout: time.Second * 30,
 		ReadTimeout:  time.Second * 10,
 		IdleTimeout:  time.Minute,
 	}
 
-	slog.Info("Starting server", "listening at", app.Config.Address)
+	slog.Info(fmt.Sprintf("Starting server, listening at %s", srv.Addr))
 
 	return srv.ListenAndServe()
-}
-
-type ApiConfig struct {
-	Address string
-	Db      database.DbConfig
 }

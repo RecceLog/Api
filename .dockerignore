@@ -24,6 +24,7 @@ bin/
 *.swo
 *~
 
+.env
 .env.local
 .env.*.local
 

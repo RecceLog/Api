@@ -54,12 +54,10 @@ temp/
 
 # OS generated files
 Thumbs.db
-.DS_Store
 .AppleDouble
 .LSOverride
 
 # Air (live reload tool)
-tmp/
 .air.toml
 
 # Debug files

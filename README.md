@@ -1,8 +1,8 @@
 # Api
 
 ## Dipendenze
+ - `air` per restartare in automatico il processo
  - `goose` per le migrazioni del database
- - `docker`, se si ha docker e non si vuole eseguire il codice sull'host allora le seguenti dipendenze non servono
  - `github.com/joho/godotenv` per caricare variabili d'ambiente
  - `github.com/gin-gonic/gin` web framework
  - `github.com/golang-jwt/jwt/v5`
@@ -17,8 +17,6 @@
   - `./internal/infrastructure` contiene file riguardanti connessioni/servizi connessi al database.
     - `./internal/infrastructure/adapters/postgresql/migrations` contiene le migrazioni per il database (postgres). Le migrazioni sono gestite dal package `goose`.
     - `./internal/infrastructure/database` contiene file utili per la connessione dell'api al database.
-    - `./internal/infrastructure/services` contiene file per inserire, ottenere, modificare o eliminare dati sul database dall'api.
-  - `./internal/presentation` contiene file utili per la configurazione degli endpoint dell'api.
 
 ## Avviare il progetto il locale
 Per avviare il server keycloak, creare un file `.env` all'interno di `./Auth` con le seguenti variabili d'ambiente:
@@ -31,51 +29,40 @@ Per avviare il server keycloak, creare un file `.env` all'interno di `./Auth` co
   - `KC_ADMIN_PASSWORD`: password dell'user temporaneo admin di keycloak
   - `KC_THEME`: schermata di login custom (in questo inserire `custom-login-theme`)
 
-Per avviare il server `go`, con un relativo database locale, invece, creare un file `.env` all'interno della cartella "base" con le seguenti variabili d'ambiente:
-  - `GOOSE_DBSTRING`: stringa per connessione al database
-  - `GOOSE_DRIVER`: database driver
-  - `GOOSE_MIGRATION_DIR`: cartella contenente le migrazioni dei database (`./internal/infrastructure/adapters/postgresql/migrations`)
-  - `JWT_PUBLIC_KEY`: chiave pubblica del server keycloak per validare i `jwt`
-  - `DEV_DB_HOST`: usare il nome del servizio definito in `./docker-compose-db.yml` (postgis)
-  - `DEV_DB_PORT`: la porta sul quale si vuole esporre il database
-  - `DEV_DB`: nome del database locale
-  - `DEV_DB_USER`: username per il database locale
-  - `DEV_DB_PASSWORD`: password per il database locale
+Per avviare il server `go`, con un relativo database postgres, avviando in automatico le migrazioni, e Redis, invece, creare un file `.env` all'interno della cartella "base" con queste variabili:
+```
+ENV=dev
 
-Creare una rete docker per far comunicare i container dei database e dell'api:
-```sh
-# Check if network exists
-docker network inspect reccelog-shared-network
+### DATABASE ###
+DB_NAME=il_tuo_db
+DB_USERNAME=il_tuo_user
+DB_PASSWORD=la_tua_password_postgres
+DB_PORT=la_tua_porta_postgres
 
-# If return value is an empty list, create
-docker network create reccelog-shared-network
+### GOOSE ####
+GOOSE_DRIVER=postgres
+GOOSE_MIGRATION_DIR=./internal/infrastructure/adapters/postgresql/migrations
+
+### REDIS ###
+REDIS_PORT=la_tua_porta_redis
+REDIS_PASSWORD=la_tua_password_redis
+
+### API ###
+ADDR=<indirizzo di ascolto del server>
+REDIS_HOST=redis
+DB_CONN_STRING=postgresql://<DB_USERNAME>:<DB_PASSWORD>@database:<DB_PORT>/<DB_NAME>
 ```
 
-Crea l'immagine docker per il server `go`:
-```sh
-docker compose -f docker-compose-api.yml build
-```
-
-Ora avviare i container con:
-```sh
-# Database container
-docker compose -f docker-compose-db.yml up -d
-# After starting database, you should run migrations
-goose up
-
-# Auth container
-docker compose -f Auth/docker-compose.yml up -d
-
-# Api container
-docker compose -f docker-compose-api.yml up -d
-# Or if you want to build and run
-docker compose -f docker-compose-api.yml up -d --build
+e avviare i servizi con
+```shell
+docker compose up -d
 ```
 
 # Esempi di richieste
 ```http request
-# INSERIRE STRADA: Panoramica
-POST https://reccelogapi.onrender.com/v1/routes/
+# Panoramica
+POST http://localhost:8080/v1/routes
+#POST https://reccelogapi.onrender.com/v1/routes/
 Content-Type: application/json
 
 {
@@ -116,8 +103,9 @@ Content-Type: application/json
 }
 
 ###
-# INSERIRE STRADA: Strada comunale superga
-POST https://reccelogapi.onrender.com/v1/routes/
+# Strada comunale superga
+POST http://localhost:8080/v1/routes
+#POST https://reccelogapi.onrender.com/v1/routes/
 Content-Type: application/json
 
 {
@@ -159,7 +147,8 @@ Content-Type: application/json
 
 ###
 # INSERIRE STRADA: Via cave (rorà)
-POST https://reccelogapi.onrender.com/v1/routes/
+POST http://localhost:8080/v1/routes/
+#POST https://reccelogapi.onrender.com/v1/routes/
 Content-Type: application/json
 
 {
@@ -261,7 +250,8 @@ Content-Type: application/json
 
 ###
 # INSERIRE STRADA: Strada secondaria rorà
-POST https://reccelogapi.onrender.com/v1/routes/
+POST http://localhost:8080/v1/routes/
+#POST https://reccelogapi.onrender.com/v1/routes/
 Content-Type: application/json
 
 {
@@ -317,25 +307,28 @@ Content-Type: application/json
 
 ###
 # OTTENERE TUTTE LE STRADE
-GET https://reccelogapi.onrender.com/v1/routes
+GET http://localhost:8080/v1/routes
+#GET https://reccelogapi.onrender.com/v1/routes
 
 ###
 # OTTENERE DATI DI STRADA SPECIFICA CON TUTTI I NOTE SET
-GET https://reccelogapi.onrender.com/v1/routes/019b85eb-2bbc-7bf0-a08b-d4b1f811750d
+GET http://localhost:8080/v1/routes/019d464a-1ca6-7b7b-a194-0201eaf94986
+#GET https://reccelogapi.onrender.com/v1/routes/019b85eb-2bbc-7bf0-a08b-d4b1f811750d
 
 ###
 # OTTENERE TUTTE LE STRADE IN UN RANGE
-GET https://reccelogapi.onrender.com/v1/routes/range/10000
+GET http://localhost:8080/v1/routes/range/40300
+#GET https://reccelogapi.onrender.com/v1/routes/range/10000
 Latitude: 45.013902
 Longitude: 7.659012
 
 ###
-# OTTENERE NOTE DI UN SET DI UNA STRADA
-GET http://localhost:8080/v1/routes/019aeac6-4dea-71f7-86b6-e05e67ce5167/note-set/019aeac5-4df9-7abc-9d29-a09c9485a5ff
+# OTTENERE NOTE DI UN SET
+GET http://localhost:8080/v1/notes/019d4648-ae13-7b6c-9391-bb16346f1c2e
 
 ###
 # MODIFICA NOTA DI UN SET DI UNA STRADA
-PATCH http://localhost:8080/v1/notes/019aeac6-4dea-71f7-86b6-e05e67ce5167/note-set/019aeac6-4df9-7abc-9d29-a09c9485a5ff/note/
+#PATCH http://localhost:8080/v1/notes/019aeac6-4dea-71f7-86b6-e05e67ce5167/note-set/019aeac6-4df9-7abc-9d29-a09c9485a5ff/note/
 
 ###
 # AGGIUNGERE SET DI NOTE AD UNA STRADA
@@ -368,6 +361,6 @@ Content-Type: application/json
 }
 
 ###
-# CANCELLA SET DI NOTE DI UNA STRADA
-DELETE http://localhost:8080/v1/routes/019aeac6-4dea-71f7-86b6-e05e67ce5167/note-set/019aeb3b-ba19-7ebc-8ea1-609050485c48
+# CANCELLA SET DI NOTE
+DELETE http://localhost:8080/v1/notes/019aeb3b-ba19-7ebc-8ea1-609050485c48
 ```
