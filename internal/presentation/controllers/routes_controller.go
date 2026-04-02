@@ -10,12 +10,12 @@ import (
 	"github.com/google/uuid"
 )
 
-type routesController struct {
+type RoutesController struct {
 	routesService services.RoutesService
 }
 
-func NewRoutesController(routesService services.RoutesService) *routesController {
-	return &routesController{
+func NewRoutesController(routesService services.RoutesService) *RoutesController {
+	return &RoutesController{
 		routesService: routesService,
 	}
 }
@@ -34,7 +34,7 @@ type RouteNotesResponse struct {
 
 // --- Handlers ---
 
-func (c *routesController) CreateRoute(ctx *gin.Context) {
+func (c *RoutesController) CreateRoute(ctx *gin.Context) {
 
 	var body CreateRouteRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {
@@ -51,7 +51,7 @@ func (c *routesController) CreateRoute(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"id": body.Route.Id})
 }
 
-func (c *routesController) GetRoutes(ctx *gin.Context) {
+func (c *RoutesController) GetRoutes(ctx *gin.Context) {
 
 	routes, err := c.routesService.FindAll(ctx.Request.Context())
 	if err != nil {
@@ -62,7 +62,7 @@ func (c *routesController) GetRoutes(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"routes": routes})
 }
 
-func (c *routesController) GetRoutesInRange(ctx *gin.Context) {
+func (c *RoutesController) GetRoutesInRange(ctx *gin.Context) {
 
 	rangeM, err := strconv.Atoi(ctx.Param("range"))
 	if err != nil {
@@ -82,7 +82,7 @@ func (c *routesController) GetRoutesInRange(ctx *gin.Context) {
 		return
 	}
 
-	routes, err := c.routesService.FindInRange(ctx.Request.Context(), domain.Coordinate{Lat: lat, Lng: lng}, rangeM)
+	routes, err := c.routesService.FindInRange(ctx.Request.Context(), domain.Coordinate{Lat: lat, Lng: lng}, rangeM*1000 /* to km */)
 	if err != nil {
 		ErrorResponse(ctx, http.StatusInternalServerError, "Error retrieving routes in range", err)
 		return
@@ -91,7 +91,7 @@ func (c *routesController) GetRoutesInRange(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"routes": routes})
 }
 
-func (c *routesController) GetRouteById(ctx *gin.Context) {
+func (c *RoutesController) GetRouteById(ctx *gin.Context) {
 
 	id, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
@@ -114,7 +114,7 @@ func (c *routesController) GetRouteById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, RouteNotesResponse{Route: route, NotesSets: noteSets})
 }
 
-func (c *routesController) DeleteRoute(ctx *gin.Context) {
+func (c *RoutesController) DeleteRoute(ctx *gin.Context) {
 
 	id, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
