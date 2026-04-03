@@ -3,6 +3,7 @@ package controllers
 import (
 	"Api/internal/application/services"
 	"Api/internal/domain"
+	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -49,6 +50,8 @@ func (c *routesController) CreateRoute(ctx *gin.Context) {
 		ErrorResponse(ctx, http.StatusBadRequest, "Invalid request body", err)
 		return
 	}
+
+	slog.Info("il body ricevuto è", "body", body)
 
 	err := c.routesService.CreateWithNotes(ctx.Request.Context(), &body.Route, &body.NoteSet)
 	if err != nil {
