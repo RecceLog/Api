@@ -60,13 +60,7 @@ func (c *notesController) GetNoteSetOfRoute(ctx *gin.Context) {
 }
 
 func (c *notesController) DeleteNoteSetFromRoute(ctx *gin.Context) {
-
-	if _, err := uuid.Parse(ctx.Param("id")); err != nil {
-		ErrorResponse(ctx, http.StatusBadRequest, "Invalid UUID format for route id", err)
-		return
-	}
-
-	setId, err := uuid.Parse(ctx.Param("set"))
+	setId, err := uuid.Parse(ctx.Param("id"))
 	if err != nil {
 		ErrorResponse(ctx, http.StatusBadRequest, "Invalid UUID format for set id", err)
 		return

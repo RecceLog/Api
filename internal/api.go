@@ -64,7 +64,7 @@ func (app Application) Mount() http.Handler {
 
 		// DELETE
 		routes.DELETE("/:id", routesController.DeleteRoute)
-		notes.DELETE("/:set", notesController.DeleteNoteSetFromRoute)
+		notes.DELETE("/:id", notesController.DeleteNoteSetFromRoute)
 	}
 
 	return r

@@ -2,7 +2,6 @@ package main
 
 import (
 	"Api/internal"
-	"Api/internal/infrastructure/cache"
 	"Api/internal/infrastructure/database"
 	"context"
 	"log/slog"
@@ -48,12 +47,12 @@ func configureServices(ctx context.Context) (*pgxpool.Pool, *redis.Client) {
 	slog.Debug("Connected to database")
 
 	// caching configuration
-	rdb, err := cache.ConnectRedis(ctx)
+	/*rdb, err := cache.ConnectRedis(ctx)
 	if err != nil {
 		slog.Error("Error connecting to redis, shutting down", "error message", err.Error())
 		os.Exit(1)
 	}
-	slog.Debug("Caching initialized")
+	slog.Debug("Caching initialized")*/
 
-	return dbConnPool, rdb
+	return dbConnPool, nil
 }
