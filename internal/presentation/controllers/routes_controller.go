@@ -3,7 +3,6 @@ package controllers
 import (
 	"Api/internal/application/services"
 	"Api/internal/domain"
-	"log/slog"
 	"net/http"
 	"strconv"
 
@@ -47,7 +46,6 @@ func (c *routesController) CreateRoute(ctx *gin.Context) {
 
 	var body CreateRouteRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {
-		slog.Info("il body ricevuto è", "body", body)
 		ErrorResponse(ctx, http.StatusBadRequest, "Invalid request body", err)
 		return
 	}
