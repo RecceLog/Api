@@ -1,5 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
+CREATE EXTENSION postgis;
+
 CREATE TABLE IF NOT EXISTS routes (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
     start GEOMETRY NOT NULL,
@@ -18,8 +20,8 @@ CREATE TABLE IF NOT EXISTS note_sets (
     route_id UUID NOT NULL REFERENCES routes(id) ON DELETE CASCADE
 );
 
-CREATE TYPE note_type AS ENUM('indication', 'warning');
-CREATE TYPE direction_type AS ENUM('left', 'right', 'straight', '');
+CREATE TYPE note_type AS ENUM('INDICATION', 'WARNING');
+CREATE TYPE direction_type AS ENUM('LEFT', 'RIGHT', 'STRAIGHT', 'CHICANE');
 CREATE TABLE IF NOT EXISTS notes (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
     set_id UUID NOT NULL REFERENCES note_sets(id) ON DELETE CASCADE,

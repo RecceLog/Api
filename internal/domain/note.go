@@ -9,7 +9,7 @@ type Note struct {
 	Position    Coordinate `json:"position" binding:"required"`
 	Order       int        `json:"order"`
 	Type        string     `json:"type" binding:"required"`
-	Severity    string     `json:"severity"`
+	Severity    int        `json:"severity"`
 	Direction   string     `json:"direction"`
 	Description string     `json:"description"`
 }
