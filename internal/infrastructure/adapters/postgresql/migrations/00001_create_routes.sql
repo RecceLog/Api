@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS notes (
     position GEOMETRY NOT NULL,
     "order" INT NOT NULL,
     "type" NOTE_TYPE NOT NULL,
-    severity VARCHAR(1),
+    severity INT,
     direction DIRECTION_TYPE,
     "description" VARCHAR(255)
 );
