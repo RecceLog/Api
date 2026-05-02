@@ -4,6 +4,8 @@ import (
 	"Api/internal/domain"
 	"Api/internal/infrastructure/database"
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -37,9 +39,25 @@ func (r *routesRepository) Insert(ctx context.Context, q database.Querier, route
 	if err != nil {
 		return err
 	}
+	replacer := strings.NewReplacer(
+		"$1", route.Id.String(),
+		"$2", fmt.Sprintf("%f", route.Start.Lng),
+		"$3", fmt.Sprintf("%f", route.Start.Lat),
+		"$4", fmt.Sprintf("%f", route.Finish.Lng),
+		"$5", fmt.Sprintf("%f", route.Finish.Lat),
+	)
+	fmt.Printf("%s;", replacer.Replace(database.InsertRoute))
 
 	// Insert waypoints
 	for i, stop := range route.Waypoints {
+		waypointReplacer := strings.NewReplacer(
+			"$1", route.Id.String(),
+			"$2", fmt.Sprintf("%f", stop.Position.Lng),
+			"$3", fmt.Sprintf("%f", stop.Position.Lat),
+			"$4", fmt.Sprintf("%d", i+1),
+		)
+		fmt.Printf("%s;", waypointReplacer.Replace(database.InsertRouteWaypoint))
+
 		_, err = q.Exec(
 			ctx,
 			database.InsertRouteWaypoint,

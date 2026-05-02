@@ -2,7 +2,7 @@ FROM golang:1.25.5-alpine3.23
 
 WORKDIR /app
 
-RUN go install github.com/pressly/goose/v3/cmd/goose@latest
+RUN go install github.com/pressly/goose/v3/cmd/goose@v3.27.0
 
 COPY . .
 RUN go mod download

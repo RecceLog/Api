@@ -66,7 +66,6 @@ func (s *routesService) CreateWithNotes(ctx context.Context, r *domain.Route, ns
 }
 
 // AddNoteSet inserts an additional note set for an existing route.
-// No transaction needed: single logical operation.
 func (s *routesService) AddNoteSet(ctx context.Context, ns *domain.NoteSet, routeId uuid.UUID) error {
 	return s.notesRepo.InsertSet(ctx, s.pool, ns, routeId)
 }

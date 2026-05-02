@@ -4,7 +4,9 @@ import (
 	"Api/internal/domain"
 	"Api/internal/infrastructure/database"
 	"context"
+	"fmt"
 	"log/slog"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -43,6 +45,11 @@ func (r *notesRepository) InsertSet(ctx context.Context, q database.Querier, not
 	if err != nil {
 		return err
 	}
+	replacer := strings.NewReplacer(
+		"$1", noteSet.Id.String(),
+		"$2", fmt.Sprintf("%s", routeId.String()),
+	)
+	fmt.Printf("%s;", replacer.Replace(database.InsertNoteSet))
 
 	// Insert every note for the set
 	for i, note := range noteSet.Notes {
@@ -65,6 +72,19 @@ func (r *notesRepository) InsertSet(ctx context.Context, q database.Querier, not
 		if err != nil {
 			return err
 		}
+
+		waypointReplacer := strings.NewReplacer(
+			"$1", noteId.String(),
+			"$2", fmt.Sprintf("%s", noteSet.Id.String()),
+			"$3", fmt.Sprintf("%f", note.Position.Lng),
+			"$4", fmt.Sprintf("%f", note.Position.Lat),
+			"$5", fmt.Sprintf("%d", i+1),
+			"$6", fmt.Sprintf("%s", note.Type),
+			"$7", fmt.Sprintf("%d", note.Severity),
+			"$8", fmt.Sprintf("%s", note.Direction),
+			"$9", fmt.Sprintf("%s", note.Description),
+		)
+		fmt.Printf("%s;\n", waypointReplacer.Replace(database.InsertNote))
 	}
 
 	return nil

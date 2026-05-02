@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE EXTENSION postgis;
+-- CREATE EXTENSION IF NOT EXISTS postgis;
 
 CREATE TABLE IF NOT EXISTS routes (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
@@ -32,6 +32,31 @@ CREATE TABLE IF NOT EXISTS notes (
     direction DIRECTION_TYPE,
     "description" VARCHAR(255)
 );
+
+WITH route AS (
+INSERT INTO routes(start, finish)
+VALUES (
+    ST_SetSRID(ST_MakePoint(7.287241, 44.806422), 4326),
+    ST_SetSRID(ST_MakePoint(7.200493, 44.791587), 4326)
+    )
+    RETURNING id
+    ),
+    note_set AS (
+INSERT INTO note_sets(route_id)
+SELECT id FROM route
+    RETURNING id, route_id
+    ),
+    waypoints_insert AS (
+INSERT INTO waypoints(route_id, position, "order")
+SELECT route_id, ST_SetSRID(ST_MakePoint(7.272475, 44.806649), 4326), 1 FROM note_set
+UNION ALL
+SELECT route_id, ST_SetSRID(ST_MakePoint(7.255800, 44.804868), 4326), 2 FROM note_set
+    RETURNING id
+    )
+INSERT INTO notes(set_id, position, "order", "type", severity, direction, "description")
+SELECT note_set.id, ST_SetSRID(ST_MakePoint(7.282342, 44.806329), 4326), 1, 'INDICATION'::note_type, 4, 'RIGHT'::direction_type, 'test' FROM note_set
+UNION ALL
+SELECT note_set.id, ST_SetSRID(ST_MakePoint(7.281546, 44.806480), 4326), 2, 'INDICATION'::note_type, 5, 'LEFT'::direction_type, 'test' FROM note_set;
 -- +goose StatementEnd
 
 -- +goose Down
